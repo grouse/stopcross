@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://dki5yc3dkw55v"]
+[gd_scene load_steps=7 format=3 uid="uid://dki5yc3dkw55v"]
 
 [ext_resource type="Script" uid="uid://3mn4ufhsyv08" path="res://scripts/character_controller_3d.gd" id="1_cs6s8"]
 
@@ -11,9 +11,11 @@
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iyx0m"]
 albedo_color = Color(0, 0, 0, 1)
 
+[sub_resource type="SphereShape3D" id="SphereShape3D_cs6s8"]
+
 [node name="CharacterBody3D" type="CharacterBody3D"]
 collision_layer = 2
-collision_mask = 3
+collision_mask = 7
 script = ExtResource("1_cs6s8")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -29,3 +31,15 @@ skeleton = NodePath("../..")
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 1, 0.392747, 0.5, 0)
 mesh = SubResource("BoxMesh_bl13t")
 surface_material_override/0 = SubResource("StandardMaterial3D_iyx0m")
+
+[node name="interact_volume" type="Area3D" parent="pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.736263, 0, 0)
+collision_layer = 8
+collision_mask = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="pivot/interact_volume"]
+transform = Transform3D(1.728, 0, 0, 0, 1.728, 0, 0, 0, 1.728, 0, -0.184603, 0)
+shape = SubResource("SphereShape3D_cs6s8")
+
+[connection signal="body_entered" from="pivot/interact_volume" to="." method="_on_interact_volume_body_entered"]
+[connection signal="body_exited" from="pivot/interact_volume" to="." method="_on_interact_volume_body_exited"]

@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://dnwhy8avsdq8p"]
+[gd_scene load_steps=5 format=3 uid="uid://dnwhy8avsdq8p"]
 
 [ext_resource type="PackedScene" uid="uid://dki5yc3dkw55v" path="res://prefabs/character.tscn" id="1_errlg"]
 [ext_resource type="Material" uid="uid://bf583qpwyixoo" path="res://materials/m_prototype_green.tres" id="2_bl13t"]
+[ext_resource type="PackedScene" uid="uid://cd4mbf16r5jp3" path="res://prefabs/chest.tscn" id="3_iyx0m"]
 
 [sub_resource type="Environment" id="Environment_bl13t"]
 
@@ -27,3 +28,10 @@ environment = SubResource("Environment_bl13t")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment"]
 transform = Transform3D(1, 0, 0, 0, -0.356966, 0.934117, 0, -0.934117, -0.356966, 0, 10, 0)
 shadow_enabled = true
+
+[node name="chest" parent="." instance=ExtResource("3_iyx0m")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -4.37958, 0.0999999, -6.56327)
+
+[node name="chest2" parent="." instance=ExtResource("3_iyx0m")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0.129884, 0.1, -6.49492)
+initially_open = true

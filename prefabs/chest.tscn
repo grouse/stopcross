@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://cd4mbf16r5jp3"]
+
+[ext_resource type="PackedScene" uid="uid://dmi1pvqh0eli0" path="res://external/kenney_mini-dungeon/Models/GLB format/chest.glb" id="1_7lya3"]
+[ext_resource type="Script" uid="uid://cqpgfkwngloqo" path="res://prefabs/chest.gd" id="2_5xlvm"]
+[ext_resource type="Script" uid="uid://c3fcsgugu3wgo" path="res://scripts/interact.gd" id="2_c347f"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_7lya3"]
+
+[node name="chest" instance=ExtResource("1_7lya3")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+script = ExtResource("2_5xlvm")
+
+[node name="chest" parent="." index="0"]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+
+[node name="interact_volume" type="Area3D" parent="." index="2" node_paths=PackedStringArray("root")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+collision_layer = 8
+collision_mask = 10
+script = ExtResource("2_c347f")
+root = NodePath("..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="interact_volume" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.16523, 0.471554)
+shape = SubResource("SphereShape3D_7lya3")
