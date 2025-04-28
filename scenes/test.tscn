@@ -1,3 +1,29 @@
-[gd_scene format=3 uid="uid://dnwhy8avsdq8p"]
+[gd_scene load_steps=4 format=3 uid="uid://dnwhy8avsdq8p"]
+
+[ext_resource type="PackedScene" uid="uid://dki5yc3dkw55v" path="res://prefabs/character.tscn" id="1_errlg"]
+[ext_resource type="Material" uid="uid://bf583qpwyixoo" path="res://materials/m_prototype_green.tres" id="2_bl13t"]
+
+[sub_resource type="Environment" id="Environment_bl13t"]
 
 [node name="root" type="Node3D"]
+
+[node name="player" parent="." instance=ExtResource("1_errlg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+
+[node name="Camera3D" type="Camera3D" parent="player"]
+transform = Transform3D(1, 0, 0, 0, 0.412802, 0.910821, 0, -0.910821, 0.412802, 0, 6, 2)
+
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="."]
+material_override = ExtResource("2_bl13t")
+use_collision = true
+collision_mask = 3
+
+[node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(100, 0, 0, 0, 0.2, 0, 0, 0, 100, 0, 0, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_bl13t")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment"]
+transform = Transform3D(1, 0, 0, 0, -0.356966, 0.934117, 0, -0.934117, -0.356966, 0, 10, 0)
+shadow_enabled = true
