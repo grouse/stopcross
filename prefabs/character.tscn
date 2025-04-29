@@ -41,5 +41,7 @@ collision_mask = 8
 transform = Transform3D(1.728, 0, 0, 0, 1.728, 0, 0, 0, 1.728, 0, -0.184603, 0)
 shape = SubResource("SphereShape3D_cs6s8")
 
+[connection signal="area_entered" from="pivot/interact_volume" to="." method="_on_interact_volume_area_entered"]
+[connection signal="area_exited" from="pivot/interact_volume" to="." method="_on_interact_volume_area_exited"]
 [connection signal="body_entered" from="pivot/interact_volume" to="." method="_on_interact_volume_body_entered"]
 [connection signal="body_exited" from="pivot/interact_volume" to="." method="_on_interact_volume_body_exited"]

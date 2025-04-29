@@ -1,7 +1,7 @@
 extends Node3D
 
 @export var initially_open : bool = false;
-var is_open = false;
+@onready var is_open = initially_open
 
 func _ready() -> void:
 	if initially_open:
@@ -12,9 +12,9 @@ func _ready() -> void:
 func open() -> void:
 	if is_open: return
 	$AnimationPlayer.play("open")
-	pass
+	is_open = true
 
 func close() -> void:
-	if not is_open: return
+	if !is_open: return
 	$AnimationPlayer.play("close")
-	pass
+	is_open = false 

@@ -5,6 +5,8 @@ extends CharacterBody3D
 
 var input_direction : Vector3 = Vector3.ZERO;
 
+var chests : Array[Node]
+
 func _ready() -> void:
 	pass
 
@@ -26,13 +28,20 @@ func _process(delta: float) -> void:
 	if Input.is_action_pressed("move_left"):    input_direction.x -= 1;
 	if Input.is_action_pressed("move_forward"): input_direction.z -= 1;
 	if Input.is_action_pressed("move_back"):    input_direction.z += 1;
-	
 
+	if chests.size() > 0:
+		if Input.is_action_just_pressed("interact_open"):
+			var chest = chests.pop_back()
+			chest.open()
 
-func _on_interact_volume_body_entered(body: Node3D) -> void:
-	print(body)
-	pass
+func _on_interact_volume_area_entered(area: Area3D) -> void:
+	var node = area
+	if node as Interact: node = node.root
+	if node.is_in_group("chest") && !chests.has(node): chests.append(node)
 
-func _on_interact_volume_body_exited(body: Node3D) -> void:
-	print(body)
-	pass
+func _on_interact_volume_area_exited(area: Area3D) -> void:
+	var node = area
+	if node as Interact: node = node.root
+	if node.is_in_group("chest"):
+		var index = chests.find(node)
+		if index != -1: chests.remove_at(index)
