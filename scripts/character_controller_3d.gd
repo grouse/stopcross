@@ -23,11 +23,9 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func _process(delta: float) -> void:
-	input_direction = Vector3.ZERO;
-	if Input.is_action_pressed("move_right"):   input_direction.x += 1;
-	if Input.is_action_pressed("move_left"):    input_direction.x -= 1;
-	if Input.is_action_pressed("move_forward"): input_direction.z -= 1;
-	if Input.is_action_pressed("move_back"):    input_direction.z += 1;
+	var direction = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+	input_direction.x = direction.x;
+	input_direction.z = direction.y;
 
 	if chests.size() > 0:
 		if Input.is_action_just_pressed("interact_open"):
