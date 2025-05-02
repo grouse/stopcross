@@ -49,3 +49,7 @@ interact_open={
 3d_physics/layer_2="character"
 3d_physics/layer_3="objects"
 3d_physics/layer_4="interact"
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
