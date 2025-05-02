@@ -30,9 +30,7 @@ func reject(a : Vector3, b : Vector3) -> Vector3:
 	return a-b*(a.dot(b)/b.dot(b))
 
 func _physics_process(delta: float) -> void:
-
 	var dir   = velocity.normalized()
-	var f_dir = -dir
 	var t_dir = input_direction.normalized()
 
 	var accel = acceleration
@@ -47,6 +45,7 @@ func _physics_process(delta: float) -> void:
 
 			if angle > PI * 0.8:
 				accel = reverse_decel*2
+				dir = t_dir
 			elif angle > max_angle_change:
 				var axis = dir.cross(t_dir).normalized()
 				if axis.length_squared() > 0.0001:
@@ -55,16 +54,26 @@ func _physics_process(delta: float) -> void:
 			else:
 				velocity = t_dir*velocity.length()
 				dir = t_dir
+	else:
+		dir = t_dir
+
+
+	var speed = velocity.length()
+	if t_dir.length_squared() > 0:
+		speed = min(speed+accel*delta, max_speed)
+	else:
+		speed = max(speed-friction*delta, 0)
+
+	if speed > 0 and dir.length_squared() > 0.0001:
+		velocity = dir*speed
+	else:
+		velocity = Vector3.ZERO
 
 	if draw_movement_vectors:
 		DebugDraw3D.draw_arrow(global_position, global_position+t_dir*acceleration, Color.RED, 0.1)
-		DebugDraw3D.draw_arrow(global_position, global_position+f_dir*friction, Color.MAGENTA, 0.1)
+		DebugDraw3D.draw_arrow(global_position, global_position-dir*friction, Color.MAGENTA, 0.1)
 		DebugDraw3D.draw_arrow(global_position, global_position+velocity, Color.GREEN, 0.1)
-
-	velocity += t_dir*accel*delta + f_dir*friction*delta;
-
-	if velocity.length_squared() > max_speed*max_speed: 
-		velocity = velocity.normalized()*max_speed;
+		DebugDraw3D.draw_text(global_position+Vector3.FORWARD+Vector3.UP, "%.2f" % velocity.length(), 64)
 
 	if t_dir.length_squared() > 0:
 		$pivot.basis = Basis(t_dir, Vector3.UP, t_dir.cross(Vector3.UP).normalized())
