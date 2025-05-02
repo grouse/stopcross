@@ -7,6 +7,9 @@ extends CharacterBody3D
 @export_range(0, 100, 0.01, "suffix:s") var time_to_turn_90      : float = 0.05
 @export_range(0, 100, 0.01, "suffix:s") var time_to_stop_reverse : float = 0.15
 
+@export_group("Debug")
+@export var draw_movement_vectors : bool = false
+
 @onready var acceleration  = max_speed / time_to_max_speed
 @onready var deceleration  = max_speed / time_to_stop;
 
@@ -53,9 +56,11 @@ func _physics_process(delta: float) -> void:
 				velocity = t_dir*velocity.length()
 				dir = t_dir
 
-	DebugDraw3D.draw_arrow(global_position, global_position+velocity, Color.GREEN, 0.05)
-	DebugDraw3D.draw_arrow(global_position, global_position+t_dir*acceleration, Color.RED, 0.05)
-	DebugDraw3D.draw_arrow(global_position, global_position+f_dir*friction, Color.MAGENTA, 0.05)
+	if draw_movement_vectors:
+		DebugDraw3D.draw_arrow(global_position, global_position+t_dir*acceleration, Color.RED, 0.1)
+		DebugDraw3D.draw_arrow(global_position, global_position+f_dir*friction, Color.MAGENTA, 0.1)
+		DebugDraw3D.draw_arrow(global_position, global_position+velocity, Color.GREEN, 0.1)
+
 	velocity += t_dir*accel*delta + f_dir*friction*delta;
 
 	if velocity.length_squared() > max_speed*max_speed: 
