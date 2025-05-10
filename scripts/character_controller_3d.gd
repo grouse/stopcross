@@ -26,8 +26,8 @@ var input_direction : Vector3 = Vector3.ZERO;
 var chests : Array[Node]
 
 func _ready() -> void:
-	if time_to_turn_90 > 0: turn_rate_rad = 0.5 / time_to_turn_90
-	reverse_decel = max_speed / time_to_stop_reverse if time_to_stop_reverse > 0 else deceleration
+	if time_to_turn_90 > 0: turn_rate_rad = 1 / time_to_turn_90
+	reverse_decel = max_speed*2 / time_to_stop_reverse if time_to_stop_reverse > 0 else deceleration
 
 func _unhandled_input(event: InputEvent) -> void:
 	pass
@@ -41,7 +41,7 @@ func _physics_process(delta: float) -> void:
 
 	var dir   = velocity.normalized()
 	var t_dir = input_direction.normalized()
-	t_dir = t_dir - t_dir.dot(gravity_dir)*gravity_dir
+	#t_dir = (t_dir - t_dir.dot(gravity_dir)*gravity_dir).normalized()
 
 	var movement_velocity = velocity - velocity.dot(gravity_dir)*gravity_dir
 
@@ -57,37 +57,41 @@ func _physics_process(delta: float) -> void:
 	else:
 		external_velocity -= external_velocity.dot(gravity_dir)*gravity_dir
 
-	if movement_velocity.length_squared() > 0.0001:
-		if t_dir.length_squared() <= 0.0001:
-			if is_on_floor(): friction = deceleration
-		else:
-			var angle = dir.angle_to(t_dir)
-			var max_angle_change = turn_rate_rad*delta
-
-			if angle > PI * 0.8:
-				accel = reverse_decel*2
-				dir = t_dir
-			elif angle > max_angle_change:
-				var axis = dir.cross(t_dir).normalized()
-				if axis.length_squared() > 0.0001:
-					movement_velocity = dir.rotated(axis, max_angle_change)*movement_velocity.length()
-					dir = movement_velocity.normalized()
+	if is_on_floor():
+		if movement_velocity.length_squared() > 0.0001:
+			if t_dir.length_squared() <= 0.0001:
+				if is_on_floor(): friction = deceleration
 			else:
-				movement_velocity = t_dir*movement_velocity.length()
-				dir = t_dir
-	else:
-		dir = t_dir
+				var angle = dir.angle_to(t_dir)
+				var max_angle_change = turn_rate_rad*delta
 
-	var speed = movement_velocity.length()
-	if t_dir.length_squared() > 0:
-		speed = min(speed+accel*delta, max_speed)
-	else:
-		speed = max(speed-friction*delta, 0)
+				if angle > PI * 0.8:
+					print("reversing")
+					accel = reverse_decel
+				elif angle > max_angle_change:
+					print("turning slowly")
+					var axis = dir.cross(t_dir).normalized()
+					if axis.length_squared() > 0.0001:
+						movement_velocity = dir.rotated(axis, max_angle_change)*movement_velocity.length()
+						t_dir = movement_velocity.normalized()
+					pass
+				else:
+					movement_velocity = t_dir*movement_velocity.length()
+					dir = t_dir
+					pass
 
-	if speed > 0 and dir.length_squared() > 0.0001:
-		movement_velocity = dir*speed
-	else:
-		movement_velocity = Vector3.ZERO
+		var speed = movement_velocity.length()
+		if t_dir.length_squared() > 0:
+			movement_velocity += accel*t_dir*delta
+			speed = clamp(movement_velocity.length(), 0, max_speed)
+			movement_velocity = movement_velocity.normalized()*speed
+		else:
+			movement_velocity -= friction*dir*delta
+			speed = clamp(movement_velocity.length(), 0, max_speed)
+			movement_velocity = movement_velocity.normalized()*speed
+
+		if speed <= 0 || movement_velocity.length_squared() <= 0.0001:
+			movement_velocity = Vector3.ZERO
 
 	velocity = movement_velocity + external_velocity
 
@@ -100,9 +104,10 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	if draw_movement_vectors:
-		DebugDraw3D.draw_arrow(global_position, global_position+t_dir*acceleration, Color.RED, 0.1)
-		DebugDraw3D.draw_arrow(global_position, global_position-dir*friction, Color.MAGENTA, 0.1)
-		DebugDraw3D.draw_arrow(global_position, global_position+velocity, Color.GREEN, 0.1)
+		DebugDraw3D.draw_arrow(global_position, global_position+movement_velocity, Color.GREEN, 0.1)
+		DebugDraw3D.draw_arrow(global_position, global_position+external_velocity, Color.MAGENTA, 0.1)
+		DebugDraw3D.draw_arrow(global_position, global_position+t_dir, Color.BLUE, 0.1)
+		DebugDraw3D.draw_arrow(global_position, global_position-dir*friction, Color.RED, 0.1)
 		DebugDraw3D.draw_text(global_position+Vector3.FORWARD+Vector3.UP, "%.2f" % velocity.length(), 64)
 
 		if is_on_floor() and !was_on_floor:
