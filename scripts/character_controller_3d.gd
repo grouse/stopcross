@@ -10,6 +10,8 @@ extends CharacterBody3D
 @export_group("Falling")
 @export_range(0, 100, 0.01) var gravity_scale : float = 1
 @export_range(0, 1000, 0.01, "suffix:m/s") var terminal_velocity : float = 50
+@export_range(0, 1, 0.01) var air_control_factor : float = 1
+@export_range(0, 100, 0.01) var air_friction: float = 1
 
 @export_group("Debug")
 @export var draw_movement_vectors : bool = false
@@ -60,8 +62,9 @@ func _physics_process(delta: float) -> void:
 
 	var movement_velocity = velocity - velocity.dot(gravity_dir)*gravity_dir
 
-	var accel = acceleration if is_on_floor() else 0
-	var friction = 0
+	var control_factor = 1 if is_on_floor() else air_control_factor
+	var accel = acceleration
+	var friction = 0 if is_on_floor() else air_friction
 
 	if not is_on_floor(): 
 		external_velocity += gravity_dir*gravity_strength*delta
@@ -88,24 +91,22 @@ func _physics_process(delta: float) -> void:
 					if axis.length_squared() > 0.0001:
 						movement_velocity = dir.rotated(axis, max_angle_change)*movement_velocity.length()
 						t_dir = movement_velocity.normalized()
-					pass
 				else:
 					movement_velocity = t_dir*movement_velocity.length()
 					dir = t_dir
-					pass
 
-		var speed = movement_velocity.length()
-		if t_dir.length_squared() > 0:
-			movement_velocity += accel*t_dir*delta
-			speed = clamp(movement_velocity.length(), 0, max_speed)
-			movement_velocity = movement_velocity.normalized()*speed
-		else:
-			movement_velocity -= friction*dir*delta
-			speed = clamp(movement_velocity.length(), 0, max_speed)
-			movement_velocity = movement_velocity.normalized()*speed
+	var speed = movement_velocity.length()
+	if t_dir.length_squared() > 0:
+		movement_velocity += accel*t_dir*delta*control_factor
+		speed = clamp(movement_velocity.length(), 0, max_speed)
+		movement_velocity = movement_velocity.normalized()*speed
+	else:
+		movement_velocity -= friction*dir*delta
+		speed = clamp(movement_velocity.length(), 0, max_speed)
+		movement_velocity = movement_velocity.normalized()*speed
 
-		if speed <= 0 || movement_velocity.length_squared() <= 0.0001:
-			movement_velocity = Vector3.ZERO
+	if speed <= 0 || movement_velocity.length_squared() <= 0.0001:
+		movement_velocity = Vector3.ZERO
 
 	velocity = movement_velocity + external_velocity
 
