@@ -39,9 +39,24 @@ func _physics_process(delta: float) -> void:
 	var gravity_dir = get_gravity().normalized()
 	var gravity_strength = get_gravity().length() * gravity_scale
 
+	var u_dir = -gravity_dir
+
 	var dir   = velocity.normalized()
 	var t_dir = input_direction.normalized()
-	#t_dir = (t_dir - t_dir.dot(gravity_dir)*gravity_dir).normalized()
+	var i_dir = t_dir
+
+	if is_on_wall():
+		var wall_n = get_wall_normal()
+		if draw_movement_vectors: DebugDraw3D.draw_arrow(global_position, global_position+wall_n, Color.AQUA, 0.1)
+
+		if t_dir.length_squared() > 0.0001:
+			var wall_t = t_dir - t_dir.dot(wall_n)*wall_n
+			if draw_movement_vectors: DebugDraw3D.draw_arrow(global_position, global_position+wall_t, Color.TURQUOISE, 0.1)
+			if wall_t.length_squared() > 0.0001:
+				t_dir = wall_t.normalized()
+		pass
+
+	t_dir = (t_dir - t_dir.dot(gravity_dir)*gravity_dir).normalized()
 
 	var movement_velocity = velocity - velocity.dot(gravity_dir)*gravity_dir
 
@@ -65,11 +80,10 @@ func _physics_process(delta: float) -> void:
 				var angle = dir.angle_to(t_dir)
 				var max_angle_change = turn_rate_rad*delta
 
+
 				if angle > PI * 0.8:
-					print("reversing")
 					accel = reverse_decel
 				elif angle > max_angle_change:
-					print("turning slowly")
 					var axis = dir.cross(t_dir).normalized()
 					if axis.length_squared() > 0.0001:
 						movement_velocity = dir.rotated(axis, max_angle_change)*movement_velocity.length()
@@ -95,8 +109,8 @@ func _physics_process(delta: float) -> void:
 
 	velocity = movement_velocity + external_velocity
 
-	if t_dir.length_squared() > 0:
-		$pivot.basis = Basis(t_dir, Vector3.UP, t_dir.cross(Vector3.UP).normalized())
+	if i_dir.length_squared() > 0:
+		$pivot.basis = Basis(i_dir, u_dir, i_dir.cross(u_dir).normalized())
 
 	var was_on_floor = is_on_floor()
 	var old_transform = global_transform
@@ -106,6 +120,7 @@ func _physics_process(delta: float) -> void:
 	if draw_movement_vectors:
 		DebugDraw3D.draw_arrow(global_position, global_position+movement_velocity, Color.GREEN, 0.1)
 		DebugDraw3D.draw_arrow(global_position, global_position+external_velocity, Color.MAGENTA, 0.1)
+		DebugDraw3D.draw_arrow(global_position, global_position+i_dir, Color.CYAN, 0.1)
 		DebugDraw3D.draw_arrow(global_position, global_position+t_dir, Color.BLUE, 0.1)
 		DebugDraw3D.draw_arrow(global_position, global_position-dir*friction, Color.RED, 0.1)
 		DebugDraw3D.draw_text(global_position+Vector3.FORWARD+Vector3.UP, "%.2f" % velocity.length(), 64)
