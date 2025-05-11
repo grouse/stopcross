@@ -1,8 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://dnwhy8avsdq8p"]
+[gd_scene load_steps=7 format=3 uid="uid://dnwhy8avsdq8p"]
 
 [ext_resource type="PackedScene" uid="uid://dki5yc3dkw55v" path="res://prefabs/character.tscn" id="1_errlg"]
 [ext_resource type="Material" uid="uid://bf583qpwyixoo" path="res://materials/m_prototype_green.tres" id="2_bl13t"]
 [ext_resource type="PackedScene" uid="uid://cd4mbf16r5jp3" path="res://prefabs/chest.tscn" id="3_iyx0m"]
+[ext_resource type="PackedScene" uid="uid://epggiqlvug7f" path="res://prefabs/lever.tscn" id="3_j5jx5"]
+[ext_resource type="Material" uid="uid://n2gxn4dwqbwa" path="res://materials/m_prototype_grey.tres" id="4_74lek"]
 
 [sub_resource type="Environment" id="Environment_bl13t"]
 
@@ -10,29 +12,33 @@
 
 [node name="player" parent="." instance=ExtResource("1_errlg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
-time_to_stop = 0.1
+max_speed = 8.0
+time_to_max_speed = 0.5
+time_to_stop = 0.05
 time_to_stop_reverse = 0.2
 air_control_factor = 0.5
-air_friction = 10.0
 
 [node name="Camera3D" type="Camera3D" parent="player"]
 transform = Transform3D(1, 0, 0, 0, 0.412802, 0.910821, 0, -0.910821, 0.412802, 0, 6, 2)
 
-[node name="CSGCombiner3D" type="CSGCombiner3D" parent="."]
+[node name="ground" type="CSGCombiner3D" parent="."]
 material_override = ExtResource("2_bl13t")
 use_collision = true
 collision_mask = 3
 
-[node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D"]
+[node name="CSGBox3D" type="CSGBox3D" parent="ground"]
 transform = Transform3D(100, 0, 0, 0, 0.2, 0, 0, 0, 100, 0, 0, 0)
 
-[node name="CSGBox3D2" type="CSGBox3D" parent="CSGCombiner3D"]
+[node name="CSGBox3D2" type="CSGBox3D" parent="ground"]
 transform = Transform3D(8, 0, 0, 0, 6.9282, -4, 0, 4, 6.9282, 10.503, -1.43611, 0)
 
-[node name="CSGSphere3D" type="CSGSphere3D" parent="CSGCombiner3D/CSGBox3D2"]
+[node name="CSGSphere3D" type="CSGSphere3D" parent="ground/CSGBox3D2"]
 transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -3.95115, -2.10727, 1.21663)
 radial_segments = 25
 rings = 24
+
+[node name="lever" parent="ground" instance=ExtResource("3_j5jx5")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 4.7, 0.1, -6.2)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_bl13t")
@@ -47,3 +53,24 @@ transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -4.37958, 0.0999999, -6
 [node name="chest2" parent="." instance=ExtResource("3_iyx0m")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0.129884, 0.1, -6.49492)
 initially_open = true
+
+[node name="walls" type="CSGCombiner3D" parent="."]
+material_override = ExtResource("4_74lek")
+use_collision = true
+collision_mask = 15
+
+[node name="CSGBox3D" type="CSGBox3D" parent="walls"]
+transform = Transform3D(10, 0, 0, 0, 3, 0, 0, 0, 0.3, 11.9596, 1.48477, -21.4337)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="walls/CSGBox3D"]
+transform = Transform3D(0.141, 0, 0, 0, 0.68, 0, 0, 0, 1, 0, -0.133333, 0)
+operation = 2
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="walls"]
+transform = Transform3D(10, 0, 0, 0, 3, 0, 0, 0, 0.3, 11.9596, 1.48477, -31.1337)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="walls"]
+transform = Transform3D(-4.37114e-07, 0, 0.3, 0, 3, 0, -10, 0, -1.31134e-08, 16.9883, 1.48477, -26.2537)
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="walls"]
+transform = Transform3D(-4.37114e-07, 0, 0.3, 0, 3, 0, -10, 0, -1.31134e-08, 7.08827, 1.48477, -26.2537)
