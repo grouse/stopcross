@@ -37,8 +37,9 @@ transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -3.95115, -2.10727, 1.21663)
 radial_segments = 25
 rings = 24
 
-[node name="lever" parent="ground" instance=ExtResource("3_j5jx5")]
+[node name="lever" parent="ground" node_paths=PackedStringArray("opens_node") instance=ExtResource("3_j5jx5")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 4.7, 0.1, -6.2)
+opens_node = NodePath("../../chest")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_bl13t")
