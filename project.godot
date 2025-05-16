@@ -49,6 +49,7 @@ interact_open={
 3d_physics/layer_2="character"
 3d_physics/layer_3="objects"
 3d_physics/layer_4="interact"
+3d_physics/layer_5="dynamic_world"
 
 [physics]
 

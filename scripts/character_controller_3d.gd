@@ -10,8 +10,8 @@ extends CharacterBody3D
 @export_group("Falling")
 @export_range(0, 100, 0.01) var gravity_scale : float = 1
 @export_range(0, 1000, 0.01, "suffix:m/s") var terminal_velocity : float = 50
-@export_range(0, 1, 0.01) var air_control_factor : float = 1
-@export_range(0, 100, 0.01) var air_friction: float = 1
+@export_range(0, 1, 0.01) var air_control_factor : float = 0.3 
+@export_range(0, 100, 0.01) var air_friction : float = 0
 
 @export_group("Debug")
 @export var draw_movement_vectors : bool = false
@@ -65,7 +65,7 @@ func _physics_process(delta: float) -> void:
 
 	var control_factor = 1 if is_on_floor() else air_control_factor
 	var accel = acceleration
-	var friction = 0 if is_on_floor() else air_friction
+	var friction = deceleration if is_on_floor() else 0
 
 	if not is_on_floor(): 
 		external_velocity += gravity_dir*gravity_strength*delta
@@ -73,14 +73,11 @@ func _physics_process(delta: float) -> void:
 		if falling_component.length() > terminal_velocity:
 			external_velocity -= falling_component
 			external_velocity += gravity_dir*terminal_velocity
-	else:
-		external_velocity -= external_velocity.dot(gravity_dir)*gravity_dir
 
 	if is_on_floor():
 		if movement_velocity.length_squared() > 0.0001:
-			if t_dir.length_squared() <= 0.0001:
-				if is_on_floor(): friction = deceleration
-			else:
+			if t_dir.length_squared() > 0.0001:
+				friction = 0
 				var angle = dir.angle_to(t_dir)
 				var max_angle_change = turn_rate_rad*delta
 
@@ -99,14 +96,14 @@ func _physics_process(delta: float) -> void:
 	var speed = movement_velocity.length()
 	if t_dir.length_squared() > 0:
 		movement_velocity += accel*t_dir*delta*control_factor
-		speed = clamp(movement_velocity.length(), 0, max_speed)
+		speed = min(movement_velocity.length(), max_speed)
 		movement_velocity = movement_velocity.normalized()*speed
 	else:
-		movement_velocity -= friction*dir*delta
-		speed = clamp(movement_velocity.length(), 0, max_speed)
-		movement_velocity = movement_velocity.normalized()*speed
+		speed -= friction*delta
+		speed = max(0, speed)
+		movement_velocity = speed*dir
 
-	if speed <= 0 || movement_velocity.length_squared() <= 0.0001:
+	if movement_velocity.length_squared() <= 0.001:
 		movement_velocity = Vector3.ZERO
 
 	velocity = movement_velocity + external_velocity

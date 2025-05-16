@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://3mn4ufhsyv08" path="res://scripts/character_controller_3d.gd" id="1_cs6s8"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cs6s8"]
+size = Vector3(1, 1.99396, 1)
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_errlg"]
 
@@ -15,11 +16,11 @@ albedo_color = Color(0, 0, 0, 1)
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
 collision_layer = 2
-collision_mask = 7
+collision_mask = 23
 script = ExtResource("1_cs6s8")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.000274658, 0)
 shape = SubResource("BoxShape3D_cs6s8")
 
 [node name="pivot" type="Node3D" parent="."]

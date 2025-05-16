@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://glo24fdjedm8"]
+
+[ext_resource type="PackedScene" uid="uid://dhearh1ck8g3q" path="res://external/kenney_mini-dungeon/Models/GLB format/gate.glb" id="1_ot3m5"]
+[ext_resource type="Script" uid="uid://s8r0fxfqpr1t" path="res://prefabs/gate.gd" id="2_18fyk"]
+
+[node name="gate" instance=ExtResource("1_ot3m5")]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0)
+script = ExtResource("2_18fyk")
