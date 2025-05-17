@@ -13,8 +13,9 @@
 
 [node name="player" parent="." instance=ExtResource("1_errlg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+floor_max_angle = 0.698132
+floor_snap_length = 0.2
 max_speed = 8.0
-time_to_max_speed = 0.5
 time_to_stop = 0.05
 time_to_stop_reverse = 0.1
 air_control_factor = 0.5

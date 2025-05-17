@@ -39,11 +39,16 @@ func _physics_process(delta: float) -> void:
 	var gravity_dir = get_gravity().normalized()
 	var gravity_strength = get_gravity().length() * gravity_scale
 
-	var u_dir = -gravity_dir
+	var floor_n = get_floor_normal()
+	var floor_t = floor_n.cross(Vector3.RIGHT).normalized()
+	var floor_b = floor_t.cross(Vector3.UP).normalized()
 
+	var u_dir = -gravity_dir
 	var dir   = velocity.normalized()
 	var t_dir = input_direction.normalized()
 	var i_dir = t_dir
+
+	var movement_velocity = velocity - velocity.dot(gravity_dir)*gravity_dir
 
 	if is_on_wall():
 		var wall_n = get_wall_normal()
@@ -57,8 +62,6 @@ func _physics_process(delta: float) -> void:
 		pass
 
 	t_dir = (t_dir - t_dir.dot(gravity_dir)*gravity_dir).normalized()
-
-	var movement_velocity = velocity - velocity.dot(gravity_dir)*gravity_dir
 
 	var control_factor = 1 if is_on_floor() else air_control_factor
 	var accel = acceleration
@@ -107,6 +110,9 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	if draw_movement_vectors:
+		DebugDraw3D.draw_arrow(global_position, global_position+floor_n*2, Color.BROWN, 0.1)
+		DebugDraw3D.draw_arrow(global_position, global_position+floor_t*2, Color.OLIVE, 0.1)
+		DebugDraw3D.draw_arrow(global_position, global_position+floor_b*2, Color.AQUA, 0.1)
 		DebugDraw3D.draw_arrow(global_position, global_position+movement_velocity, Color.GREEN, 0.1)
 		DebugDraw3D.draw_arrow(global_position, global_position+external_velocity, Color.MAGENTA, 0.1)
 		DebugDraw3D.draw_arrow(global_position, global_position+i_dir, Color.CYAN, 0.1)
