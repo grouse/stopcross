@@ -1,4 +1,5 @@
 extends Node3D
+class_name MyButton
 
 @export var initially_on : bool = false
 @export var opens_node : Node

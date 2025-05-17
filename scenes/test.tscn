@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://dnwhy8avsdq8p"]
+[gd_scene load_steps=9 format=3 uid="uid://dnwhy8avsdq8p"]
 
 [ext_resource type="PackedScene" uid="uid://dki5yc3dkw55v" path="res://prefabs/character.tscn" id="1_errlg"]
 [ext_resource type="Material" uid="uid://bf583qpwyixoo" path="res://materials/m_prototype_green.tres" id="2_bl13t"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://epggiqlvug7f" path="res://prefabs/lever.tscn" id="3_j5jx5"]
 [ext_resource type="Material" uid="uid://n2gxn4dwqbwa" path="res://materials/m_prototype_grey.tres" id="4_74lek"]
 [ext_resource type="PackedScene" uid="uid://glo24fdjedm8" path="res://prefabs/gate.tscn" id="6_lpvoh"]
+[ext_resource type="PackedScene" uid="uid://d3avcq6q4ew6g" path="res://prefabs/button_floor.tscn" id="7_at5dv"]
 
 [sub_resource type="Environment" id="Environment_bl13t"]
 
@@ -80,3 +81,6 @@ transform = Transform3D(-4.37114e-07, 0, 0.3, 0, 3, 0, -10, 0, -1.31134e-08, 7.0
 
 [node name="gate" parent="." instance=ExtResource("6_lpvoh")]
 transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 3.4, 0.1, -16)
+
+[node name="button-floor" parent="." instance=ExtResource("7_at5dv")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 5.4, 0.0999908, -0.3)

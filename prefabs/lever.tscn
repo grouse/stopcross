@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://bvhfdf00fs2sb" path="res://external/kenney_prototype-kit/Models/GLB format/lever-single.glb" id="1_h71ec"]
 [ext_resource type="Script" uid="uid://c3fcsgugu3wgo" path="res://scripts/interact.gd" id="2_7d20a"]
-[ext_resource type="Script" uid="uid://b20es6r38e7pv" path="res://prefabs/lever.gd" id="2_ib36p"]
+[ext_resource type="Script" uid="uid://b20es6r38e7pv" path="res://prefabs/button.gd" id="2_ib36p"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_h71ec"]
 

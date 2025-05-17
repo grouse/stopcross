@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://d3avcq6q4ew6g"]
+
+[ext_resource type="PackedScene" uid="uid://cnevfdq827mou" path="res://external/kenney_prototype-kit/Models/GLB format/button-floor-square.glb" id="1_lcf4i"]
+[ext_resource type="Script" uid="uid://bpfajb2jcwm6o" path="res://prefabs/button-pressure.gd" id="2_rlsjw"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rlsjw"]
+size = Vector3(0.8, 0.2, 0.8)
+
+[node name="button-floor" instance=ExtResource("1_lcf4i")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+script = ExtResource("2_rlsjw")
+
+[node name="trigger-volume" type="Area3D" parent="." index="2"]
+collision_layer = 4
+collision_mask = 22
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="trigger-volume" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.98023e-08, 0.1, -8.9407e-08)
+shape = SubResource("BoxShape3D_rlsjw")
+
+[connection signal="area_entered" from="trigger-volume" to="." method="_on_triggervolume_area_entered"]
+[connection signal="area_exited" from="trigger-volume" to="." method="_on_triggervolume_area_exited"]
+[connection signal="body_entered" from="trigger-volume" to="." method="_on_triggervolume_body_entered"]
+[connection signal="body_exited" from="trigger-volume" to="." method="_on_triggervolume_body_exited"]
