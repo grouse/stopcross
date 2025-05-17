@@ -4,7 +4,6 @@ extends CharacterBody3D
 @export_range(0, 1000, 0.1, "suffix:m/s") var max_speed            : float = 10.0
 @export_range(0, 100, 0.01, "suffix:s") var time_to_max_speed    : float = 0.3
 @export_range(0, 100, 0.01, "suffix:s") var time_to_stop         : float = 0.15
-@export_range(0, 100, 0.01, "suffix:s") var time_to_turn_90      : float = 0.05
 @export_range(0, 100, 0.01, "suffix:s") var time_to_stop_reverse : float = 0.15
 
 @export_group("Falling")
@@ -21,7 +20,6 @@ extends CharacterBody3D
 
 var external_velocity : Vector3 = Vector3.ZERO
 
-var turn_rate_rad     = 10000
 var reverse_decel;
 
 var input_direction : Vector3 = Vector3.ZERO;
@@ -29,7 +27,6 @@ var chests : Array[Node]
 var levers : Array[Node]
 
 func _ready() -> void:
-	if time_to_turn_90 > 0: turn_rate_rad = 1 / time_to_turn_90
 	reverse_decel = max_speed*2 / time_to_stop_reverse if time_to_stop_reverse > 0 else deceleration
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -79,16 +76,9 @@ func _physics_process(delta: float) -> void:
 			if t_dir.length_squared() > 0.0001:
 				friction = 0
 				var angle = dir.angle_to(t_dir)
-				var max_angle_change = turn_rate_rad*delta
-
 
 				if angle > PI * 0.8:
 					accel = reverse_decel
-				elif angle > max_angle_change:
-					var axis = dir.cross(t_dir).normalized()
-					if axis.length_squared() > 0.0001:
-						movement_velocity = dir.rotated(axis, max_angle_change)*movement_velocity.length()
-						t_dir = movement_velocity.normalized()
 				else:
 					movement_velocity = t_dir*movement_velocity.length()
 					dir = t_dir

@@ -16,7 +16,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 max_speed = 8.0
 time_to_max_speed = 0.5
 time_to_stop = 0.05
-time_to_stop_reverse = 0.2
+time_to_stop_reverse = 0.1
 air_control_factor = 0.5
 
 [node name="Camera3D" type="Camera3D" parent="player"]
