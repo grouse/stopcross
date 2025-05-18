@@ -14,26 +14,17 @@ extends CharacterBody3D
 
 @export_group("Debug")
 @export var draw_movement_vectors : bool = false
+@export var draw_wall_detection : bool = false
 
-@onready var acceleration  = max_speed / time_to_max_speed
-@onready var deceleration  = max_speed / time_to_stop;
+@onready var acceleration  = max_speed / time_to_max_speed if time_to_max_speed > 0 else max_speed
+@onready var deceleration  = max_speed / time_to_stop if time_to_stop > 0 else max_speed
+@onready var reverse_decel = max_speed * 2 / time_to_stop_reverse if time_to_stop_reverse > 0 else deceleration
 
 var external_velocity : Vector3 = Vector3.ZERO
-
-var reverse_decel;
-
 var input_direction : Vector3 = Vector3.ZERO;
+
 var chests : Array[Node]
 var levers : Array[Node]
-
-func _ready() -> void:
-	reverse_decel = max_speed*2 / time_to_stop_reverse if time_to_stop_reverse > 0 else deceleration
-
-func _unhandled_input(event: InputEvent) -> void:
-	pass
-
-func reject(a : Vector3, b : Vector3) -> Vector3:
-	return a-b*(a.dot(b)/b.dot(b))
 
 func _physics_process(delta: float) -> void:
 	var gravity_dir = get_gravity().normalized()
@@ -52,11 +43,11 @@ func _physics_process(delta: float) -> void:
 
 	if is_on_wall():
 		var wall_n = get_wall_normal()
-		if draw_movement_vectors: DebugDraw3D.draw_arrow(global_position, global_position+wall_n, Color.AQUA, 0.1)
+		if draw_wall_detection: DebugDraw3D.draw_arrow(global_position, global_position+wall_n*2, Color.AQUA, 0.1)
 
 		if t_dir.length_squared() > 0.0001:
-			var wall_t = t_dir - t_dir.dot(wall_n)*wall_n
-			if draw_movement_vectors: DebugDraw3D.draw_arrow(global_position, global_position+wall_t, Color.TURQUOISE, 0.1)
+			var wall_t = (t_dir - t_dir.dot(wall_n)*wall_n).normalized()
+			if draw_wall_detection: DebugDraw3D.draw_arrow(global_position, global_position+wall_t*2, Color.TURQUOISE, 0.1)
 			if wall_t.length_squared() > 0.0001:
 				t_dir = wall_t.normalized()
 		pass
