@@ -34,11 +34,18 @@ animation/import_rest_as_RESET=false
 import_script/path=""
 _subresources={
 "nodes": {
+"PATH:button-floor-square": {
+"physics/layer": 4,
+"physics/mask": 23,
+"physics/shape_type": 1
+},
 "PATH:button-floor-square/button": {
 "generate/physics": true,
 "physics/layer": 4,
 "physics/mask": 23,
-"physics/shape_type": 1
+"physics/shape_type": 3,
+"primitive/position": Vector3(0, 0.075, 0),
+"primitive/size": Vector3(0.9, 0.15, 0.9)
 }
 }
 }

@@ -15,6 +15,10 @@ run/main_scene="uid://dnwhy8avsdq8p"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 
+[dotnet]
+
+project/assembly_name="stopcross"
+
 [input]
 
 move_left={
@@ -50,6 +54,7 @@ interact_open={
 3d_physics/layer_3="objects"
 3d_physics/layer_4="interact"
 3d_physics/layer_5="dynamic_world"
+3d_physics/layer_6="platform"
 
 [physics]
 

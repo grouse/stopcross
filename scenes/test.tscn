@@ -83,4 +83,4 @@ transform = Transform3D(-4.37114e-07, 0, 0.3, 0, 3, 0, -10, 0, -1.31134e-08, 7.0
 transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 3.4, 0.1, -16)
 
 [node name="button-floor" parent="." instance=ExtResource("7_at5dv")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 5.4, 0.0999908, -0.3)
+transform = Transform3D(1.00696, 0, 0, 0, 1.00696, 0, 0, 0, 1.00696, 5.4, 0.0999908, -0.3)

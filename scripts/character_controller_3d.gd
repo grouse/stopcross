@@ -1,4 +1,4 @@
-extends CharacterBody3D
+extends IKCC 
 
 @export_group("Movement")
 @export_range(0, 1000, 0.1, "suffix:m/s") var max_speed            : float = 10.0
@@ -30,7 +30,7 @@ func _physics_process(delta: float) -> void:
 	var gravity_dir = get_gravity().normalized()
 	var gravity_strength = get_gravity().length() * gravity_scale
 
-	var floor_n = get_floor_normal()
+	var floor_n = last_floor_normal
 	var floor_t = floor_n.cross(Vector3.RIGHT).normalized()
 	var floor_b = floor_t.cross(Vector3.UP).normalized()
 
@@ -41,31 +41,20 @@ func _physics_process(delta: float) -> void:
 
 	var movement_velocity = velocity - velocity.dot(gravity_dir)*gravity_dir
 
-	if is_on_wall():
-		var wall_n = get_wall_normal()
-		if draw_wall_detection: DebugDraw3D.draw_arrow(global_position, global_position+wall_n*2, Color.AQUA, 0.1)
-
-		if t_dir.length_squared() > 0.0001:
-			var wall_t = (t_dir - t_dir.dot(wall_n)*wall_n).normalized()
-			if draw_wall_detection: DebugDraw3D.draw_arrow(global_position, global_position+wall_t*2, Color.TURQUOISE, 0.1)
-			if wall_t.length_squared() > 0.0001:
-				t_dir = wall_t.normalized()
-		pass
-
 	t_dir = (t_dir - t_dir.dot(gravity_dir)*gravity_dir).normalized()
 
-	var control_factor = 1 if is_on_floor() else air_control_factor
+	var control_factor = 1 if is_on_floor else air_control_factor
 	var accel = acceleration
-	var friction = deceleration if is_on_floor() else 0
+	var friction = deceleration if is_on_floor else 0
 
-	if not is_on_floor(): 
+	if not is_on_floor:
 		external_velocity += gravity_dir*gravity_strength*delta
 		var falling_component = external_velocity.dot(gravity_dir)*gravity_dir
 		if falling_component.length() > terminal_velocity:
 			external_velocity -= falling_component
 			external_velocity += gravity_dir*terminal_velocity
 
-	if is_on_floor():
+	if is_on_floor:
 		if movement_velocity.length_squared() > 0.0001:
 			if t_dir.length_squared() > 0.0001:
 				friction = 0
@@ -95,7 +84,7 @@ func _physics_process(delta: float) -> void:
 	if i_dir.length_squared() > 0:
 		$pivot.basis = Basis(i_dir, u_dir, i_dir.cross(u_dir).normalized())
 
-	var was_on_floor = is_on_floor()
+	var was_on_floor = is_on_floor
 	var old_transform = global_transform
 
 	move_and_slide()
@@ -111,9 +100,9 @@ func _physics_process(delta: float) -> void:
 		DebugDraw3D.draw_arrow(global_position, global_position-dir*friction, Color.RED, 0.1)
 		DebugDraw3D.draw_text(global_position+Vector3.FORWARD+Vector3.UP, "%.2f" % velocity.length(), 64)
 
-		if is_on_floor() and !was_on_floor:
+		if is_on_floor and !was_on_floor:
 			DebugDraw3D.draw_sphere(old_transform.origin, 0.5, Color.GREEN, 1)
-		elif !is_on_floor() and was_on_floor:
+		elif !is_on_floor and was_on_floor:
 			DebugDraw3D.draw_sphere(old_transform.origin, 0.5, Color.RED, 1)
 
 		DebugDraw3D.draw_sphere(old_transform.origin, 0.1, Color.WHITE, 1)
