@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://dki5yc3dkw55v"]
 
-[ext_resource type="Script" uid="uid://3mn4ufhsyv08" path="res://scripts/character_controller_3d.gd" id="1_cs6s8"]
+[ext_resource type="Script" uid="uid://chcek762bvq8o" path="res://scripts/player.gd" id="1_cs6s8"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_cs6s8"]
 
@@ -14,11 +14,19 @@ albedo_color = Color(0, 0, 0, 1)
 [sub_resource type="SphereShape3D" id="SphereShape3D_cs6s8"]
 
 [node name="CharacterBody3D" type="CharacterBody3D" node_paths=PackedStringArray("collider")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
 collision_layer = 2
 collision_mask = 23
+floor_constant_speed = true
 script = ExtResource("1_cs6s8")
+max_speed = 25.0
+time_to_stop = 2.0
+gravity_scale = 2.0
+terminal_velocity = 120.0
+air_friction = 0.5
 collider = NodePath("CollisionShape3D")
 floor_max_angle_degrees = 40.0
+floor_constant_speed = true
 max_snap_length = 0.3
 wall_constant_speed = true
 ceiling_constant_speed = true

@@ -20,11 +20,12 @@ extends IKCC
 @onready var deceleration  = max_speed / time_to_stop if time_to_stop > 0 else max_speed
 @onready var reverse_decel = max_speed * 2 / time_to_stop_reverse if time_to_stop_reverse > 0 else deceleration
 
+func _ready() -> void:
+	print("Acceleration: %.2f m/s², Deceleration: %.2f m/s², Reverse Deceleration: %.2f m/s²" % [acceleration, deceleration, reverse_decel])
+
+
 var external_velocity : Vector3 = Vector3.ZERO
 var input_direction : Vector3 = Vector3.ZERO;
-
-var chests : Array[Node]
-var levers : Array[Node]
 
 func _physics_process(delta: float) -> void:
 	var gravity_dir = get_gravity().normalized()
@@ -35,51 +36,39 @@ func _physics_process(delta: float) -> void:
 	var floor_b = floor_t.cross(Vector3.UP).normalized()
 
 	var u_dir = -gravity_dir
+	var i_dir = input_direction.normalized()
 	var dir   = velocity.normalized()
-	var t_dir = input_direction.normalized()
-	var i_dir = t_dir
-
-	var movement_velocity = velocity - velocity.dot(gravity_dir)*gravity_dir
-
-	t_dir = (t_dir - t_dir.dot(gravity_dir)*gravity_dir).normalized()
-
-	var control_factor = 1 if is_on_floor else air_control_factor
-	var accel = acceleration
-	var friction = deceleration if is_on_floor else 0
-
-	if not is_on_floor:
-		external_velocity += gravity_dir*gravity_strength*delta
-		var falling_component = external_velocity.dot(gravity_dir)*gravity_dir
-		if falling_component.length() > terminal_velocity:
-			external_velocity -= falling_component
-			external_velocity += gravity_dir*terminal_velocity
 
 	if is_on_floor:
-		if movement_velocity.length_squared() > 0.0001:
-			if t_dir.length_squared() > 0.0001:
-				friction = 0
-				var angle = dir.angle_to(t_dir)
+		var friction_factor = 1
+		var ground_accel = acceleration
+		var ground_friction = deceleration
 
-				if angle > PI * 0.8:
-					accel = reverse_decel
-				else:
-					movement_velocity = t_dir*movement_velocity.length()
-					dir = t_dir
+		if i_dir != Vector3.ZERO:
+			friction_factor = 0
+			var turn_angle = velocity.angle_to(i_dir)
+			if turn_angle > PI*0.8:
+				ground_accel = reverse_decel
+			else:
+				# snap-turn to input_dir 
+				velocity = i_dir*velocity.length()
+				dir = velocity.normalized()
 
-	var speed = movement_velocity.length()
-	if t_dir.length_squared() > 0:
-		movement_velocity += accel*t_dir*delta*control_factor
-		speed = min(movement_velocity.length(), max_speed)
-		movement_velocity = movement_velocity.normalized()*speed
+		var ground_dir = i_dir.slide(current_floor_normal).normalized()
+		velocity += gravity_dir.dot(ground_dir) * ground_dir * delta * gravity_strength
+
+		velocity = apply_friction(velocity, ground_friction*friction_factor, delta)
+		velocity = accelerate(velocity, ground_accel, i_dir, max_speed, delta)
 	else:
-		speed -= friction*delta
-		speed = max(0, speed)
-		movement_velocity = speed*dir
+		velocity += gravity_dir*gravity_strength * delta
 
-	if movement_velocity.length_squared() <= 0.001:
-		movement_velocity = Vector3.ZERO
+		var v_velocity = velocity.project(up_direction)
+		var h_velocity = velocity - v_velocity
 
-	velocity = movement_velocity + external_velocity
+		var air_accel = acceleration * air_control_factor
+		h_velocity = apply_friction(h_velocity, air_friction, delta)
+		h_velocity = accelerate(h_velocity, air_accel, i_dir, max_speed, delta)
+		velocity = h_velocity + v_velocity
 
 	if i_dir.length_squared() > 0:
 		$pivot.basis = Basis(i_dir, u_dir, i_dir.cross(u_dir).normalized())
@@ -93,11 +82,8 @@ func _physics_process(delta: float) -> void:
 		DebugDraw3D.draw_arrow(global_position, global_position+floor_n*2, Color.BROWN, 0.1)
 		DebugDraw3D.draw_arrow(global_position, global_position+floor_t*2, Color.OLIVE, 0.1)
 		DebugDraw3D.draw_arrow(global_position, global_position+floor_b*2, Color.AQUA, 0.1)
-		DebugDraw3D.draw_arrow(global_position, global_position+movement_velocity, Color.GREEN, 0.1)
 		DebugDraw3D.draw_arrow(global_position, global_position+external_velocity, Color.MAGENTA, 0.1)
 		DebugDraw3D.draw_arrow(global_position, global_position+i_dir, Color.CYAN, 0.1)
-		DebugDraw3D.draw_arrow(global_position, global_position+t_dir, Color.BLUE, 0.1)
-		DebugDraw3D.draw_arrow(global_position, global_position-dir*friction, Color.RED, 0.1)
 		DebugDraw3D.draw_text(global_position+Vector3.FORWARD+Vector3.UP, "%.2f" % velocity.length(), 64)
 
 		if is_on_floor and !was_on_floor:
@@ -112,40 +98,39 @@ func _process(delta: float) -> void:
 	input_direction.x = direction.x;
 	input_direction.z = direction.y;
 
-	if chests.size() > 0:
-		if Input.is_action_just_pressed("interact_open"):
-			var chest = chests.back()
-			chest.open()
 
-	if levers.size() > 0:
-		if Input.is_action_just_pressed("interact_open"):
-			var lever = levers.back()
-			lever.switch_toggle()
+static func apply_friction(
+	p_velocity       : Vector3,
+	p_friction_speed : float,
+	p_delta_t        : float) -> Vector3 :
 
-func add_interacting_object(node : Node, nodes : Array[Node]) -> bool:
-	if nodes.has(node): return false
+	if p_velocity == Vector3.ZERO: return Vector3.ZERO
+	if is_zero_approx(p_velocity.length_squared()): return Vector3.ZERO
+	if is_zero_approx(p_friction_speed): return p_velocity
+	
+	var friction : Vector3 = -p_velocity * p_friction_speed * p_delta_t
+	var new_velocity : Vector3 = p_velocity + friction
 
-	print("adding interacting object: ", node)
-	nodes.append(node)
-	return true
+	var dir = p_velocity.normalized()
+	var new_speed = max(0, dir.dot(new_velocity))
+	return dir*new_speed
 
-func remove_interacting_object(node : Node, nodes : Array[Node]) -> bool:
-	var index = nodes.find(node)
-	if index == -1: return false
-
-	print("removing interacting object: ", node)
-	nodes.remove_at(index)
-	return true 
-
-
-func _on_interact_volume_area_entered(area: Area3D) -> void:
-	var node = area
-	if node as Interact: node = node.root
-	if node.is_in_group("chest"): add_interacting_object(node, chests)
-	if node.is_in_group("lever"): add_interacting_object(node, levers)
-
-func _on_interact_volume_area_exited(area: Area3D) -> void:
-	var node = area
-	if node as Interact: node = node.root
-	if node.is_in_group("chest"): remove_interacting_object(node, chests)
-	if node.is_in_group("lever"): remove_interacting_object(node, levers)
+static func accelerate(
+	p_velocity  : Vector3,
+	p_accel     : float,
+	p_accel_dir : Vector3,
+	p_max_speed : float,
+	p_delta_t   : float
+	) -> Vector3 :
+	if p_accel_dir.is_zero_approx() :
+		return p_velocity
+	
+	# Add acceleration
+	var accel_speed  : float = p_accel * p_delta_t
+	var new_velocity : Vector3 = p_velocity + p_accel_dir * accel_speed
+	
+	# Liimt length
+	var max_speed : float = maxf(p_max_speed, p_velocity.length())
+	new_velocity = new_velocity.limit_length(max_speed)
+	
+	return new_velocity
